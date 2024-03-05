@@ -1,4 +1,4 @@
-package com
+package Application
 
 import scala.math.{cos, sin, Pi}
 
