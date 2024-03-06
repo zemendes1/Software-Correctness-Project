@@ -1,6 +1,9 @@
 package Application
 
-import scalafx.Includes._
+import Application.CommandValidator
+
+import javafx.application.Application
+import scalafx.Includes.*
 import scalafx.application.JFXApp3
 import scalafx.geometry.Insets
 import scalafx.scene.Scene
@@ -65,6 +68,7 @@ object Main extends JFXApp3 {
   private def handleExecuteButtonClick(commandTextArea: TextArea, event: MouseEvent): Unit = {
     // Handle the execution of commands entered in the TextArea
     val command = commandTextArea.getText
+
     println(s"Executing command: $command")
     // Add your command execution logic here
   }
