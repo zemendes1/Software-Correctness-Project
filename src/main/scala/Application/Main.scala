@@ -1,22 +1,22 @@
 package Application
 
-import Application.CommandValidator
-
-import javafx.application.Application
 import scalafx.Includes.*
 import scalafx.application.JFXApp3
+import scalafx.beans.property.{ObjectProperty, StringProperty}
 import scalafx.geometry.Insets
 import scalafx.scene.Scene
 import scalafx.scene.control.{Button, TextArea}
 import scalafx.scene.effect.DropShadow
 import scalafx.scene.input.MouseEvent
 import scalafx.scene.layout.{HBox, VBox}
-import scalafx.scene.paint.{Color, LinearGradient, Stops}
+import scalafx.scene.paint.{Color, LinearGradient, Stops, Paint}
 import scalafx.scene.text.Text
+
 
 object Main extends JFXApp3 {
 
-
+  private val commandValidityTextProperty: StringProperty = StringProperty("Welcome to the Drawing App")
+  private val commandValidityColorProperty: ObjectProperty[Paint] = ObjectProperty[Paint](Color.Black)
 
   override def start(): Unit =
     stage = new JFXApp3.PrimaryStage :
@@ -45,6 +45,13 @@ object Main extends JFXApp3 {
                 }
               )
             },
+            new HBox{
+              val Command_Validity: Text = new Text {
+                text <== commandValidityTextProperty
+                fill <== commandValidityColorProperty
+              }
+              children = Seq(Command_Validity)
+            },
             new HBox {
               val commandTextArea: TextArea = new TextArea {
                 id = "commandTextArea"
@@ -60,16 +67,23 @@ object Main extends JFXApp3 {
             }
           )
 
-  private def handleCanvasClick(event: MouseEvent): Unit = {
-    // Handle canvas click event (e.g., draw shapes, points, etc.)
-    // You can add your logic here based on the mouse click coordinates (event.x, event.y)
-  }
-
   private def handleExecuteButtonClick(commandTextArea: TextArea, event: MouseEvent): Unit = {
     // Handle the execution of commands entered in the TextArea
     val command = commandTextArea.getText
 
-    println(s"Executing command: $command")
+    val parsedCommand = CommandValidator().parseCommand(command)
+    if (parsedCommand.isDefined) {
+      val command = parsedCommand.get
+      commandValidityTextProperty.value = ""
+      commandValidityColorProperty.value = Color.Black
+      println(s"Executing Command: $command")
+
+    } else {
+      commandValidityTextProperty.value = "Invalid command"
+      commandValidityColorProperty.value = Color.Red
+      println("Invalid command")
+    }
+
     // Add your command execution logic here
   }
 }
