@@ -5,18 +5,22 @@ import scalafx.application.JFXApp3
 import scalafx.beans.property.{ObjectProperty, StringProperty}
 import scalafx.geometry.Insets
 import scalafx.scene.Scene
-import scalafx.scene.control.{Button, TextArea}
+import scalafx.scene.control.{Button, ListView, ScrollPane, TextArea}
 import scalafx.scene.effect.DropShadow
 import scalafx.scene.input.MouseEvent
 import scalafx.scene.layout.{HBox, VBox}
-import scalafx.scene.paint.{Color, LinearGradient, Stops, Paint}
+import scalafx.scene.paint.{Color, LinearGradient, Paint, Stops}
 import scalafx.scene.text.Text
+import scalafx.collections.ObservableBuffer
+import scalafx.geometry.Pos
 
 
 object Main extends JFXApp3 {
 
   private val commandValidityTextProperty: StringProperty = StringProperty("Welcome to the Drawing App")
   private val commandValidityColorProperty: ObjectProperty[Paint] = ObjectProperty[Paint](Color.Black)
+
+  private val executedCommands: ObservableBuffer[String] = ObservableBuffer[String]()
 
   override def start(): Unit =
     stage = new JFXApp3.PrimaryStage :
@@ -43,6 +47,18 @@ object Main extends JFXApp3 {
                     spread = 0.25
                   }
                 }
+              )
+            },
+            new HBox{
+              alignment = Pos.CenterRight
+              spacing = 10 // You can adjust the spacing as needed
+              children = Seq(
+              new ScrollPane {
+                content = new ListView[String] {
+                  items = executedCommands
+                  prefHeight = 200
+                }
+              }
               )
             },
             new HBox{
@@ -75,6 +91,7 @@ object Main extends JFXApp3 {
     if (parsedCommand) {
       commandValidityTextProperty.value = ""
       commandValidityColorProperty.value = Color.Black
+      executedCommands += command
     } else {
       commandValidityTextProperty.value = "Invalid command"
       commandValidityColorProperty.value = Color.Red
