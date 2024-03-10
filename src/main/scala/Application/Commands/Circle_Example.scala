@@ -1,8 +1,8 @@
-package Application
+package Application.Commands
 
-import scala.math.{cos, sin, Pi}
+import scala.math.{Pi, cos, sin}
 
-class Draw {
+class Circle_Example {
   val numPoints: Int = 1000
 
   def makeCircle(radius: Double, center: Array[Double]): Array[(Double, Double)] = {

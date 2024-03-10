@@ -71,13 +71,10 @@ object Main extends JFXApp3 {
     // Handle the execution of commands entered in the TextArea
     val command = commandTextArea.getText
 
-    val parsedCommand = CommandValidator().parseCommand(command)
-    if (parsedCommand.isDefined) {
-      val command = parsedCommand.get
+    val parsedCommand = CommandValidator().parseCommand(command, null)
+    if (parsedCommand) {
       commandValidityTextProperty.value = ""
       commandValidityColorProperty.value = Color.Black
-      println(s"Executing Command: $command")
-
     } else {
       commandValidityTextProperty.value = "Invalid command"
       commandValidityColorProperty.value = Color.Red
