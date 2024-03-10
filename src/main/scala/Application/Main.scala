@@ -3,22 +3,23 @@ package Application
 import scalafx.Includes.*
 import scalafx.application.JFXApp3
 import scalafx.beans.property.{ObjectProperty, StringProperty}
-import scalafx.geometry.Insets
+import scalafx.collections.ObservableBuffer
+import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.Scene
+import scalafx.scene.canvas.{Canvas, GraphicsContext}
 import scalafx.scene.control.{Button, ListView, ScrollPane, TextArea}
-import scalafx.scene.effect.DropShadow
 import scalafx.scene.input.MouseEvent
 import scalafx.scene.layout.{HBox, VBox}
-import scalafx.scene.paint.{Color, LinearGradient, Paint, Stops}
+import scalafx.scene.paint.{Color, Paint}
 import scalafx.scene.text.Text
-import scalafx.collections.ObservableBuffer
-import scalafx.geometry.Pos
 
 
 object Main extends JFXApp3 {
 
+  private val AccentColor: Paint = Color.RoyalBlue
+
   private val commandValidityTextProperty: StringProperty = StringProperty("Welcome to the Drawing App")
-  private val commandValidityColorProperty: ObjectProperty[Paint] = ObjectProperty[Paint](Color.Black)
+  private val commandValidityColorProperty: ObjectProperty[Paint] = ObjectProperty[Paint](AccentColor)
 
   private val executedCommands: ObservableBuffer[String] = ObservableBuffer[String]()
 
@@ -33,33 +34,63 @@ object Main extends JFXApp3 {
             new HBox {
               children = Seq(
                 new Text {
-                  text = "Drawing"
-                  style = "-fx-font: normal bold 40pt sans-serif"
-                  fill = new LinearGradient(endX = 0, stops = Stops(Color.Blue, Color.Green))
-                },
-                new Text {
-                  text = "App"
-                  style = "-fx-font: italic bold 40pt sans-serif"
-                  fill = new LinearGradient(endX = 0, stops = Stops(Color.Red, Color.Orange))
-                  effect = new DropShadow {
-                    color = Color.DarkGray
-                    radius = 15
-                    spread = 0.25
-                  }
+                  text = "Graph Creator Pro"
+                  style = "-fx-font: bold 40pt Montserrat"
+                  fill = AccentColor
                 }
               )
             },
             new HBox{
-              alignment = Pos.CenterRight
-              spacing = 10 // You can adjust the spacing as needed
-              children = Seq(
-              new ScrollPane {
+              val canvas: Canvas = new Canvas(600, 600)
+              val gc: GraphicsContext = canvas.graphicsContext2D
+
+              // Add limiting Perimeter
+              gc.setStroke(AccentColor)
+              gc.setLineWidth(2.0)
+              gc.strokeRect(0, 0, canvas.getWidth, canvas.getHeight)
+
+              // Draw grid
+              val gridSize = 20
+              gc.setStroke(Color.LightGray)
+              gc.setLineWidth(0.5)
+              for (i <- 0 until canvas.getWidth.toInt by gridSize) {
+                gc.strokeLine(i, 0, i, canvas.getHeight)
+              }
+              for (i <- 0 until canvas.getHeight.toInt by gridSize) {
+                gc.strokeLine(0, i, canvas.getWidth, i)
+              }
+
+
+              /*
+              // Add your drawing logic here using gc
+              gc.fill = Color.Yellow
+              gc.stroke = Color.Black
+              gc.lineWidth = 2.0
+
+              // Draw head
+              gc.fillOval(100, 100, 200, 200)
+
+
+              // Draw eyes
+              gc.fill = Color.Black
+              gc.fillOval(150, 150, 20, 20)
+              gc.fillOval(230, 150, 20, 20)
+
+              // Draw mouth
+              gc.strokeArc(150, 200, 100, 60, 0, -180, javafx.scene.shape.ArcType.OPEN)
+              */
+
+
+              val Command_Pane : ScrollPane= new ScrollPane {
                 content = new ListView[String] {
                   items = executedCommands
-                  prefHeight = 200
+                  prefHeight = 600
+                  prefWidth = 200
                 }
               }
-              )
+              alignment = Pos.CenterRight
+              spacing = 10 // You can adjust the spacing as needed
+              children = Seq(canvas, Command_Pane)
             },
             new HBox{
               val Command_Validity: Text = new Text {
@@ -73,11 +104,13 @@ object Main extends JFXApp3 {
                 id = "commandTextArea"
                 promptText = "Enter commands here..."
                 prefHeight = 100
+                prefWidth = 700
                 wrapText = true
               }
               val Button_Text: Button = new Button {
                 text = "Execute"
                 onMouseClicked = (e: MouseEvent) => handleExecuteButtonClick(commandTextArea, e)
+                prefWidth = 100
               }
               children = Seq(commandTextArea, Button_Text)
             }
@@ -90,7 +123,7 @@ object Main extends JFXApp3 {
     val parsedCommand = CommandValidator().parseCommand(command, null)
     if (parsedCommand) {
       commandValidityTextProperty.value = ""
-      commandValidityColorProperty.value = Color.Black
+      commandValidityColorProperty.value = AccentColor
       executedCommands += command
     } else {
       commandValidityTextProperty.value = "Invalid command"
