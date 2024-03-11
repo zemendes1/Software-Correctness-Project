@@ -20,7 +20,7 @@ class CoordinateMapper {
 
   def mapToCanvasSpace(xWindow: Double, yWindow: Double): (Double, Double) = {
     val xCanvas = ((xWindow - windowXMin) / (windowXMax - windowXMin)) * canvasWidth
-    val yCanvas = ((yWindow - windowYMin) / (windowYMax - windowYMin)) * canvasHeight
+    val yCanvas = canvasHeight - ((yWindow - windowYMin) / (windowYMax - windowYMin)) * canvasHeight
 
     (xCanvas, yCanvas)
   }

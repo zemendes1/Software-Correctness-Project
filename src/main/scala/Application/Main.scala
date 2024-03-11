@@ -26,7 +26,7 @@ object Main extends JFXApp3 {
   private val parsedCommands: ObservableBuffer[String] = ObservableBuffer[String]()
   private val executedCommands: ObservableBuffer[String] = ObservableBuffer[String]()
 
-  private val canvas: Canvas = new Canvas(600, 600)
+  private val canvas: Canvas = new Canvas(660, 660)
   private val gc: GraphicsContext = canvas.graphicsContext2D
 
   // Window Space for the plotter
@@ -124,15 +124,24 @@ object Main extends JFXApp3 {
     gc.strokeRect(0, 0, canvas.getWidth, canvas.getHeight)
 
     // Draw grid
-    val gridSize = 20
+    val gridSize = coordinate_to_canvas.mapToCanvasSpace(0, 0)._1.toInt // 1 unit in coordinate space is gridSize in canvas space
     gc.setStroke(Color.LightGray)
     gc.setLineWidth(0.5)
+    // Draw vertical lines
     for (i <- 0 until canvas.getWidth.toInt by gridSize) {
       gc.strokeLine(i, 0, i, canvas.getHeight)
     }
-    for (i <- 0 until canvas.getHeight.toInt by gridSize) {
+    // Draw horizontal lines
+    for (i <- canvas.getHeight.toInt until 0 by -gridSize) {
       gc.strokeLine(0, i, canvas.getWidth, i)
     }
+
+    //Draw Axes
+    gc.setStroke(Color.Black)
+    gc.setLineWidth(2.0)
+    val origo = coordinate_to_canvas.mapToCanvasSpace(0, 0)
+    gc.strokeLine(0, origo(1), canvas.getWidth, origo(1))
+    gc.strokeLine(origo(0), 0, origo(0), canvas.getHeight)
 
     // Run trough commands
     for (command <- commands) {
