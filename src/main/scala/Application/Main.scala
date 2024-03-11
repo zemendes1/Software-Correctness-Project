@@ -26,7 +26,7 @@ object Main extends JFXApp3 {
   private val parsedCommands: ObservableBuffer[String] = ObservableBuffer[String]()
   private val executedCommands: ObservableBuffer[String] = ObservableBuffer[String]()
 
-  private val canvas: Canvas = new Canvas(660, 660)
+  private val canvas: Canvas = new Canvas(660, 660) // Has to be a multiple of |XMax - XMin| and |YMax - YMin|
   private val gc: GraphicsContext = canvas.graphicsContext2D
 
   // Window Space for the plotter
