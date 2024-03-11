@@ -1,6 +1,6 @@
 package Application
 
-import Application.Commands.{CircleCommand, RectangleCommand}
+import Application.Commands.{CircleCommand, LineCommand, RectangleCommand}
 import scalafx.Includes.*
 import scalafx.application.JFXApp3
 import scalafx.beans.property.{ObjectProperty, StringProperty}
@@ -49,7 +49,7 @@ object Main extends JFXApp3 {
             new HBox {
               children = Seq(
                 new Text {
-                  text = "Graph Creator Pro"
+                  text = "Graph Creator Pro Max"
                   style = "-fx-font: bold 40pt Montserrat"
                   fill = AccentColor
                 }
@@ -108,7 +108,7 @@ object Main extends JFXApp3 {
       println("Invalid command")
     }
 
-    //println(parsedCommands)
+    // println(parsedCommands)
 
     draw_pixels_on_canvas(parsedCommands)
   }
@@ -136,14 +136,28 @@ object Main extends JFXApp3 {
 
     // Run trough commands
     for (command <- commands) {
-      //println(command)
+      // println(command)
 
       // Define a regular expression pattern to match the command and its parameters
+      val line_pattern = """(LineCommand)\(([^)]*)\)""".r
       val rectangle_pattern = """(RectangleCommand)\(([^)]*)\)""".r
       val circle_pattern = """(CircleCommand)\(([^)]*)\)""".r
 
       // Extract the command and parameters using pattern matching
       command match {
+        case line_pattern(command, params) =>
+          // println(s"Command: $command")
+          val parameters = params.split(",").map(_.trim)
+
+          val lineCommandInstance =LineCommand(parameters(0).toInt, parameters(1).toInt, parameters(2).toInt, parameters(3).toInt, parameters(4))
+          val array: Array[(Double, Double)] = lineCommandInstance.draw(Color.Black)
+
+          val pixelWriter: PixelWriter = gc.pixelWriter
+          for (i <- array.indices) {
+            val (map_x, map_y) = coordinate_to_canvas.mapToCanvasSpace(array(i)._1, array(i)._2)
+            pixelWriter.setColor(map_x.toInt, map_y.toInt, Color.Black)
+          }
+
         case rectangle_pattern(command, params) =>
           // println(s"Command: $command")
 
@@ -152,7 +166,14 @@ object Main extends JFXApp3 {
 
           // Print each parameter
           // parameters.foreach(println)
-          RectangleCommand(parameters(0).toInt, parameters(1).toInt, parameters(2).toInt, parameters(3).toInt, parameters(4))
+          val rectangleCommandInstance = RectangleCommand(parameters(0).toInt, parameters(1).toInt, parameters(2).toInt, parameters(3).toInt, parameters(4))
+          val array: Array[(Double, Double)] = rectangleCommandInstance.draw(Color.Black)
+
+          val pixelWriter: PixelWriter = gc.pixelWriter
+          for (i <- array.indices) {
+            val (map_x, map_y) = coordinate_to_canvas.mapToCanvasSpace(array(i)._1, array(i)._2)
+            pixelWriter.setColor(map_x.toInt, map_y.toInt, Color.Black)
+          }
 
         case circle_pattern(command, params) =>
           //println(s"Command: $command")
