@@ -56,10 +56,8 @@ class CommandValidator {
 
       case boundingBoxPattern(x1, y1, x2, y2) =>
 
-        draw_Color = Option(painting_color).getOrElse("Black")
-
-        val boundingBoxCommandInstance = BoundingBoxCommand(x1.toInt, y1.toInt, x2.toInt, y2.toInt, draw_Color)
-        val stringRepresentation: String = boundingBoxCommandInstance.to_String(draw_Color)
+        val boundingBoxCommandInstance = BoundingBoxCommand(x1.toInt, y1.toInt, x2.toInt, y2.toInt)
+        val stringRepresentation: String = boundingBoxCommandInstance.to_String()
         stringRepresentation
 
       case drawPattern(color, commands) if allowedColors.contains(color.toLowerCase) =>
@@ -89,23 +87,6 @@ class CommandValidator {
 
       case _ =>
         ""
-    }
-  }
-
-  private def colorConverter(text:String): Color = {
-    text match {
-      case "black" => Color.Black
-      case "white" => Color.White
-      case "red" => Color.Red
-      case "green" => Color.Green
-      case "yellow" => Color.Yellow
-      case "blue" => Color.Blue
-      case "brown" => Color.Brown
-      case "orange" => Color.Orange
-      case "pink" => Color.Pink
-      case "purple" => Color.Purple
-      case "gray" => Color.Gray
-      case _ => Color.Black
     }
   }
 }

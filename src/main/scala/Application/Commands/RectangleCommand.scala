@@ -9,7 +9,7 @@ case class RectangleCommand(x1: Int, y1: Int, x2: Int, y2: Int, drawColor: Strin
 
   def to_String: String = s"RectangleCommand($x1, $y1, $x2, $y2, $drawColor)"
 
-  def draw(color: Color): Array[(Double, Double)] = {
+  def draw(color: String): Array[(Double, Double)] = {
     // Your drawing logic using drawColor
     // starts adding leftSide to points
     val leftSide = LineCommand(x1, y1, x1, y2, drawColor).draw(color)

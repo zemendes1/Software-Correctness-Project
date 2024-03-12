@@ -9,7 +9,7 @@ case class CircleCommand(x: Int, y: Int, radius: Int, drawColor: String) {
 
   def print(): Unit = println(s"CircleCommand($x, $y, $radius)")
 
-  def to_String(draw_color: Color): String = s"CircleCommand($x, $y, $radius, $draw_color)"
+  def to_String(draw_color: String): String = s"CircleCommand($x, $y, $radius, $draw_color)"
 
   def draw(color: Color): Array[(Double, Double)] = {
     val points = new Array[(Double, Double)](numPoints)

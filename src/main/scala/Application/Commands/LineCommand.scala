@@ -7,9 +7,9 @@ case class LineCommand(x1: Int, y1: Int, x2: Int, y2: Int, drawColor: String) {
   private val numPoints = 1000
   def print(): Unit = println(s"LineCommand($x1, $y1, $x2, $y2)")
 
-  def to_String(draw_color: Color): String = s"LineCommand($x1, $y1, $x2, $y2, $draw_color)"
+  def to_String(draw_color: String): String = s"LineCommand($x1, $y1, $x2, $y2, $draw_color)"
 
-  def draw(color : Color): Array[(Double, Double)] = {
+  def draw(color : String): Array[(Double, Double)] = {
     val points = new Array[(Double, Double)](numPoints)
     val dx : Double = x2 - x1
     val dy : Double = y2 - y1

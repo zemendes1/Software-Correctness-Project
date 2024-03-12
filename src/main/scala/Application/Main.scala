@@ -12,9 +12,8 @@ import scalafx.scene.control.{Button, ListView, ScrollPane, TextArea}
 import scalafx.scene.input.MouseEvent
 import scalafx.scene.layout.{HBox, VBox}
 import scalafx.scene.paint.{Color, Paint}
-import scalafx.scene.text.Text
+import scalafx.scene.text.{Font, Text}
 import scalafx.scene.image.PixelWriter
-
 
 object Main extends JFXApp3 {
 
@@ -28,6 +27,7 @@ object Main extends JFXApp3 {
 
   private val canvas: Canvas = new Canvas(660, 660) // Has to be a multiple of |XMax - XMin| and |YMax - YMin|
   private val gc: GraphicsContext = canvas.graphicsContext2D
+  val font = new Font("Arial", 20)
 
   // Window Space for the plotter
   private val XMin: Double = -1
@@ -60,7 +60,7 @@ object Main extends JFXApp3 {
               val Command_Pane : ScrollPane= new ScrollPane {
                 content = new ListView[String] {
                   items = executedCommands
-                  prefHeight = 600
+                  prefHeight = 660
                   prefWidth = 300
                 }
               }
@@ -151,6 +151,7 @@ object Main extends JFXApp3 {
       val line_pattern = """(LineCommand)\(([^)]*)\)""".r
       val rectangle_pattern = """(RectangleCommand)\(([^)]*)\)""".r
       val circle_pattern = """(CircleCommand)\(([^)]*)\)""".r
+      val text_pattern = """(TextAtCommand)\(([^)]*)\)""".r
 
       // Extract the command and parameters using pattern matching
       command match {
@@ -159,7 +160,7 @@ object Main extends JFXApp3 {
           val parameters = params.split(",").map(_.trim)
 
           val lineCommandInstance =LineCommand(parameters(0).toInt, parameters(1).toInt, parameters(2).toInt, parameters(3).toInt, parameters(4))
-          val array: Array[(Double, Double)] = lineCommandInstance.draw(Color.Black)
+          val array: Array[(Double, Double)] = lineCommandInstance.draw("Black")
 
           val pixelWriter: PixelWriter = gc.pixelWriter
           for (i <- array.indices) {
@@ -176,7 +177,7 @@ object Main extends JFXApp3 {
           // Print each parameter
           // parameters.foreach(println)
           val rectangleCommandInstance = RectangleCommand(parameters(0).toInt, parameters(1).toInt, parameters(2).toInt, parameters(3).toInt, parameters(4))
-          val array: Array[(Double, Double)] = rectangleCommandInstance.draw(Color.Black)
+          val array: Array[(Double, Double)] = rectangleCommandInstance.draw("Black")
 
           val pixelWriter: PixelWriter = gc.pixelWriter
           for (i <- array.indices) {
@@ -201,6 +202,19 @@ object Main extends JFXApp3 {
             val (map_x, map_y) = coordinate_to_canvas.mapToCanvasSpace(array(i)._1, array(i)._2)
             pixelWriter.setColor(map_x.toInt, map_y.toInt, Color.Black)
           }
+
+        case text_pattern(command, params) =>
+          // Split the parameters by commas and trim any whitespace
+          val parameters = params.split(",").map(_.trim)
+          val (map_x, map_y) = coordinate_to_canvas.mapToCanvasSpace( parameters(0).toInt,  parameters(1).toInt)
+          val text = parameters(2)
+          val color = colorConverter(parameters(3).toLowerCase)
+
+          // Set the font and fill color for the text
+          gc.fill = color
+
+          // Draw the text on the canvas at the specified position
+          gc.fillText(text, map_x.toInt, map_y.toInt)
 
         case _ => println("Invalid command format")
       }

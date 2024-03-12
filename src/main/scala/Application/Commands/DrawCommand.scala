@@ -13,7 +13,7 @@ class DrawCommand {
 
   def print(): Unit = println(s"DrawCommand($color, $commands)")
 
-  def to_String(draw_color: Color): String = s"DrawCommand($color, $commands, $draw_color)"
+  def to_String(draw_color: String): String = s"DrawCommand($color, $commands, $draw_color)"
 
   def draw(color: Color): Unit = {
   }
