@@ -30,13 +30,13 @@ object Main extends JFXApp3 {
   val font = new Font("Arial", 20)
 
   // Window Space for the plotter
-  private val XMin: Double = -1
-  private val XMax: Double = 10
-  private val YMin: Double = -1
-  private val YMax: Double = 10
+  private val XMin: Int = -1
+  private val XMax: Int = 10
+  private val YMin: Int = -1
+  private val YMax: Int = 10
 
   val coordinate_to_canvas = new CoordinateMapper
-  coordinate_to_canvas.init(canvas.getWidth, canvas.getHeight, XMin, XMax, YMin, YMax)
+  coordinate_to_canvas.init(canvas.getWidth.toInt, canvas.getHeight.toInt, XMin, XMax, YMin, YMax)
 
   override def start(): Unit =
     stage = new JFXApp3.PrimaryStage :
@@ -124,7 +124,7 @@ object Main extends JFXApp3 {
     gc.strokeRect(0, 0, canvas.getWidth, canvas.getHeight)
 
     // Draw grid
-    val gridSize = coordinate_to_canvas.mapToCanvasSpace(0, 0)._1.toInt // 1 unit in coordinate space is gridSize in canvas space
+    val gridSize = coordinate_to_canvas.mapToCanvasSpace(0, 0)._1 // 1 unit in coordinate space is gridSize in canvas space
     gc.setStroke(Color.LightGray)
     gc.setLineWidth(0.5)
     // Draw vertical lines
@@ -160,12 +160,11 @@ object Main extends JFXApp3 {
           val parameters = params.split(",").map(_.trim)
 
           val lineCommandInstance =LineCommand(parameters(0).toInt, parameters(1).toInt, parameters(2).toInt, parameters(3).toInt, parameters(4))
-          val array: Array[(Double, Double)] = lineCommandInstance.draw("Black")
+          val array: Array[(Int, Int)] = lineCommandInstance.draw("Black")
 
           val pixelWriter: PixelWriter = gc.pixelWriter
           for (i <- array.indices) {
-            val (map_x, map_y) = coordinate_to_canvas.mapToCanvasSpace(array(i)._1, array(i)._2)
-            pixelWriter.setColor(map_x.toInt, map_y.toInt, colorConverter(lineCommandInstance.drawColor.toLowerCase()))
+            pixelWriter.setColor(array(i)._1, array(i)._2, colorConverter(lineCommandInstance.drawColor.toLowerCase()))
           }
 
         case rectangle_pattern(command, params) =>
@@ -177,12 +176,11 @@ object Main extends JFXApp3 {
           // Print each parameter
           // parameters.foreach(println)
           val rectangleCommandInstance = RectangleCommand(parameters(0).toInt, parameters(1).toInt, parameters(2).toInt, parameters(3).toInt, parameters(4))
-          val array: Array[(Double, Double)] = rectangleCommandInstance.draw("Black")
+          val array: Array[(Int, Int)] = rectangleCommandInstance.draw("Black")
 
           val pixelWriter: PixelWriter = gc.pixelWriter
           for (i <- array.indices) {
-            val (map_x, map_y) = coordinate_to_canvas.mapToCanvasSpace(array(i)._1, array(i)._2)
-            pixelWriter.setColor(map_x.toInt, map_y.toInt, colorConverter(rectangleCommandInstance.drawColor.toLowerCase()))
+            pixelWriter.setColor(array(i)._1, array(i)._2, colorConverter(rectangleCommandInstance.drawColor.toLowerCase()))
           }
 
         case circle_pattern(command, params) =>
@@ -209,7 +207,7 @@ object Main extends JFXApp3 {
           gc.fill = color
 
           // Draw the text on the canvas at the specified position
-          gc.fillText(text, map_x.toInt, map_y.toInt)
+          gc.fillText(text, map_x, map_y)
 
         case _ => println("Invalid command format")
       }

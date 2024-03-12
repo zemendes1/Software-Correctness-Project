@@ -1,6 +1,5 @@
 package Application.Commands
-
-import scalafx.scene.paint.Color
+import Application.Main.coordinate_to_canvas
 
 case class LineCommand(x1: Int, y1: Int, x2: Int, y2: Int, drawColor: String) {
 
@@ -9,16 +8,44 @@ case class LineCommand(x1: Int, y1: Int, x2: Int, y2: Int, drawColor: String) {
 
   def to_String(draw_color: String): String = s"LineCommand($x1, $y1, $x2, $y2, $draw_color)"
 
-  def draw(color : String): Array[(Double, Double)] = {
-    val points = new Array[(Double, Double)](numPoints)
-    val dx : Double = x2 - x1
-    val dy : Double = y2 - y1
-    for (i <- 0 until numPoints) {
-      val x : Double = x1 + dx * i / numPoints
-      val y : Double = y1 + dy * i / numPoints
-      points(i) = (x, y)
+  def draw(color : String): Array[(Int, Int)] = {
+    val point_1 = coordinate_to_canvas.mapToCanvasSpace(x1, y1)
+    val point_2 = coordinate_to_canvas.mapToCanvasSpace(x2, y2)
+
+    var points = Array[(Int, Int)]()
+
+    var x = point_1._1
+    var y = point_1._2
+
+    val dx = math.abs(point_2._1 - point_1._1)
+    val dy = math.abs(point_2._2 - point_1._2)
+
+    val sx = if (point_1._1 < point_2._1) 1 else -1
+    val sy = if (point_1._2 < point_2._2) 1 else -1
+
+    var err = dx - dy
+
+    while (true) {
+      points = points :+ (x, y)
+
+      if (x == point_2._1 && y == point_2._2) {
+        return points
+      }
+
+      val e2 = 2 * err
+
+      if (e2 > -dy) {
+        err -= dy
+        x += sx
+      }
+
+      if (e2 < dx) {
+        err += dx
+        y += sy
+      }
     }
 
     points
   }
+
 }
