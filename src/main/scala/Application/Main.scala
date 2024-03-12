@@ -35,7 +35,7 @@ object Main extends JFXApp3 {
   private val YMin: Double = -1
   private val YMax: Double = 10
 
-  private val coordinate_to_canvas = new CoordinateMapper
+  val coordinate_to_canvas = new CoordinateMapper
   coordinate_to_canvas.init(canvas.getWidth, canvas.getHeight, XMin, XMax, YMin, YMax)
 
   override def start(): Unit =
@@ -165,7 +165,7 @@ object Main extends JFXApp3 {
           val pixelWriter: PixelWriter = gc.pixelWriter
           for (i <- array.indices) {
             val (map_x, map_y) = coordinate_to_canvas.mapToCanvasSpace(array(i)._1, array(i)._2)
-            pixelWriter.setColor(map_x.toInt, map_y.toInt, Color.Black)
+            pixelWriter.setColor(map_x.toInt, map_y.toInt, colorConverter(lineCommandInstance.drawColor.toLowerCase()))
           }
 
         case rectangle_pattern(command, params) =>
@@ -182,25 +182,20 @@ object Main extends JFXApp3 {
           val pixelWriter: PixelWriter = gc.pixelWriter
           for (i <- array.indices) {
             val (map_x, map_y) = coordinate_to_canvas.mapToCanvasSpace(array(i)._1, array(i)._2)
-            pixelWriter.setColor(map_x.toInt, map_y.toInt, Color.Black)
+            pixelWriter.setColor(map_x.toInt, map_y.toInt, colorConverter(rectangleCommandInstance.drawColor.toLowerCase()))
           }
 
         case circle_pattern(command, params) =>
-          //println(s"Command: $command")
-
           // Split the parameters by commas and trim any whitespace
           val parameters = params.split(",").map(_.trim)
 
-          // Print each parameter
-          // parameters.foreach(println)
           val circleCommandInstance = CircleCommand(parameters(0).toInt, parameters(1).toInt, parameters(2).toInt, parameters(3))
 
-          val array: Array[(Double, Double)] = circleCommandInstance.draw(Color.Black)
+          val array: Array[(Int, Int)] = circleCommandInstance.draw("Black")
 
           val pixelWriter: PixelWriter = gc.pixelWriter
           for (i <- array.indices) {
-            val (map_x, map_y) = coordinate_to_canvas.mapToCanvasSpace(array(i)._1, array(i)._2)
-            pixelWriter.setColor(map_x.toInt, map_y.toInt, Color.Black)
+            pixelWriter.setColor(array(i)._1, array(i)._2, colorConverter(circleCommandInstance.drawColor.toLowerCase()))
           }
 
         case text_pattern(command, params) =>

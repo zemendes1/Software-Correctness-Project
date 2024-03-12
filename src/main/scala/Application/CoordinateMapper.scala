@@ -24,5 +24,15 @@ class CoordinateMapper {
 
     (xCanvas, yCanvas)
   }
+
+  def mapToCanvasSpace_radius(xWindow: Int, yWindow: Int, radius: Int): (Int, Int, Int) = {
+    val xCanvas = ((xWindow - windowXMin) / (windowXMax - windowXMin)) * canvasWidth
+    val yCanvas = canvasHeight - ((yWindow - windowYMin) / (windowYMax - windowYMin)) * canvasHeight
+    val radiusCanvas = (radius / (windowXMax - windowXMin)) * canvasWidth // You can also use canvasHeight if the aspect ratio is different
+
+    (xCanvas.toInt, yCanvas.toInt, radiusCanvas.toInt)
+  }
+
+
 }
 
