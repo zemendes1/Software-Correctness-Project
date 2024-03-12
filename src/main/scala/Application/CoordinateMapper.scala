@@ -1,36 +1,37 @@
 package Application
 
 class CoordinateMapper {
-  private var canvasWidth  : Int = _
-  private var canvasHeight : Int = _
-  private var windowXMin : Int = _
-  private var windowXMax : Int = _
-  private var windowYMin : Int = _
-  private var windowYMax : Int = _
 
-  def init(canvasWidth  : Int, canvasHeight : Int, windowXMin : Int, windowXMax : Int, windowYMin : Int, windowYMax : Int): Unit = {
-    this.canvasWidth = canvasWidth
-    this.canvasHeight = canvasHeight
-    this.windowXMin = windowXMin
-    this.windowXMax = windowXMax
-    this.windowYMin = windowYMin
-    this.windowYMax = windowYMax
-  }
+    private var canvasWidth  : Double = _
+    private var canvasHeight : Double = _
+    private var windowXMin : Double = _
+    private var windowXMax : Double = _
+    private var windowYMin : Double = _
+    private var windowYMax : Double = _
+
+    def init(canvasWidth  : Double, canvasHeight : Double, windowXMin : Double, windowXMax : Double, windowYMin : Double, windowYMax : Double): Unit = {
+      this.canvasWidth = canvasWidth
+      this.canvasHeight = canvasHeight
+      this.windowXMin = windowXMin
+      this.windowXMax = windowXMax
+      this.windowYMin = windowYMin
+      this.windowYMax = windowYMax
+    }
 
 
-  def mapToCanvasSpace(xWindow: Int, yWindow: Int): (Int, Int) = {
-    val xCanvas = ((xWindow - windowXMin) / (windowXMax - windowXMin)) * canvasWidth
-    val yCanvas = canvasHeight - ((yWindow - windowYMin) / (windowYMax - windowYMin)) * canvasHeight
+    def mapToCanvasSpace(xWindow: Double, yWindow: Double): (Int, Int) = {
+      val xCanvas = ((xWindow - windowXMin) / (windowXMax - windowXMin)) * canvasWidth
+      val yCanvas = canvasHeight - ((yWindow - windowYMin) / (windowYMax - windowYMin)) * canvasHeight
 
-    (xCanvas, yCanvas)
-  }
+      (xCanvas.toInt, yCanvas.toInt)
+    }
 
-  def mapToCanvasSpace_radius(xWindow: Int, yWindow: Int, radius: Int): (Int, Int, Int) = {
+  def mapToCanvasSpace_radius(xWindow: Double, yWindow: Double, radius: Double): (Int, Int, Int) = {
     val xCanvas = ((xWindow - windowXMin) / (windowXMax - windowXMin)) * canvasWidth
     val yCanvas = canvasHeight - ((yWindow - windowYMin) / (windowYMax - windowYMin)) * canvasHeight
     val radiusCanvas = (radius / (windowXMax - windowXMin)) * canvasWidth // You can also use canvasHeight if the aspect ratio is different
 
-    (xCanvas, yCanvas, radiusCanvas)
+    (xCanvas.toInt, yCanvas.toInt, radiusCanvas.toInt)
   }
 
 
