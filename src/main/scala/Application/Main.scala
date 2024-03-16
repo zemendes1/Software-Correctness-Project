@@ -12,6 +12,7 @@ import scalafx.scene.input.MouseEvent
 import scalafx.scene.layout.{HBox, VBox}
 import scalafx.scene.paint.{Color, Paint}
 import scalafx.scene.text.{Font, Text}
+import scalafx.scene.control.cell.TextFieldListCell
 
 object Main extends JFXApp3 {
 
@@ -58,8 +59,10 @@ object Main extends JFXApp3 {
               val Command_Pane : ScrollPane= new ScrollPane {
                 content = new ListView[String] {
                   items = executedCommands
-                  prefHeight = 660
-                  prefWidth = 300
+                  prefHeight = canvas.getWidth.toInt
+                  prefWidth = canvas.getHeight.toInt/3
+                  editable = true
+                  cellFactory = TextFieldListCell.forListView()
                 }
               }
               alignment = Pos.CenterRight
