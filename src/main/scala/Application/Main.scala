@@ -7,6 +7,7 @@ import scalafx.collections.ObservableBuffer
 import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.Scene
 import scalafx.scene.canvas.{Canvas, GraphicsContext}
+import scalafx.scene.control.ListView.EditEvent
 import scalafx.scene.control.{Button, ListView, ScrollPane, TextArea}
 import scalafx.scene.input.MouseEvent
 import scalafx.scene.layout.{HBox, VBox}
@@ -63,10 +64,13 @@ object Main extends JFXApp3 {
                   prefWidth = canvas.getHeight.toInt/3
                   editable = true
                   cellFactory = TextFieldListCell.forListView()
+                  onEditCommit = e => {
+                    handleEditCommit(executedCommands.get(e.index) , e.newValue, e)
+                  }
                 }
               }
               alignment = Pos.CenterRight
-              spacing = 10 // You can adjust the spacing as needed
+              spacing = 10
               children = Seq(canvas, Command_Pane)
             },
             new HBox{
@@ -108,9 +112,19 @@ object Main extends JFXApp3 {
       commandValidityColorProperty.value = Color.Red
       println("Invalid command")
     }
+    draw_pixels_on_canvas(parsedCommands)
+  }
 
-    // println(parsedCommands)
+  private def handleEditCommit(previous_command:String, command: String, event:EditEvent[String]): Unit = {
 
+    val parsedCommand = CommandValidator().parseCommand(command, null)
+    if (parsedCommand != "") {
+      parsedCommands.update(event.index, parsedCommand)
+      executedCommands.update(event.index, command)
+    } else {
+      // Revert the changes
+      executedCommands.update(event.index, previous_command)
+    }
     draw_pixels_on_canvas(parsedCommands)
   }
 }

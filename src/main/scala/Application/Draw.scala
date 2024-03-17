@@ -39,7 +39,6 @@ private def draw_pixels_on_canvas(commands: ObservableBuffer[String]): Unit = {
 
   // Run trough commands
   for (command <- commands) {
-    // println(command)
 
     // Define a regular expression pattern to match the command and its parameters
     val line_pattern = """(LineCommand)\(([^)]*)\)""".r
@@ -47,10 +46,13 @@ private def draw_pixels_on_canvas(commands: ObservableBuffer[String]): Unit = {
     val circle_pattern = """(CircleCommand)\(([^)]*)\)""".r
     val text_pattern = """(TextAtCommand)\(([^)]*)\)""".r
 
+    // TODO
+    //val fill_pattern =
+    //val bounding_box_pattern =
+
     // Extract the command and parameters using pattern matching
     command match {
       case line_pattern(command, params) =>
-        // println(s"Command: $command")
         val parameters = params.split(",").map(_.trim)
 
         val lineCommandInstance = LineCommand(parameters(0).toInt, parameters(1).toInt, parameters(2).toInt, parameters(3).toInt, parameters(4))
@@ -103,7 +105,12 @@ private def draw_pixels_on_canvas(commands: ObservableBuffer[String]): Unit = {
         // Draw the text on the canvas at the specified position
         gc.fillText(text, map_x, map_y)
 
-      case _ => println("Invalid command format")
+      // TODO
+      //case fill_pattern() =>
+      //case bounding_box_pattern() =>
+
+
+      case _ => println("Draw Error")
 
     }
   }
