@@ -8,7 +8,8 @@ case class CircleCommand(x: Int, y: Int, radius: Int, drawColor: String) {
   def to_String(draw_color: String): String = s"CircleCommand($x, $y, $radius, $draw_color)"
 
 
-  def draw(color: String): Array[(Int, Int)] = {
+  // Returns the points to draw with the pixel coordinates
+  def draw(): Array[(Int, Int)] = {
 
     val point = coordinate_to_canvas.mapToCanvasSpace_radius(x, y, radius)
     val converted_x = point._1

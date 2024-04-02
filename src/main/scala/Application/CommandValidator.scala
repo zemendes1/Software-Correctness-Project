@@ -60,6 +60,7 @@ class CommandValidator {
         val stringRepresentation: String = boundingBoxCommandInstance.to_String()
         stringRepresentation
 
+        // Draw commands in color, returns the string representation of the commands
       case drawPattern(color, commands) if allowedColors.contains(color.toLowerCase) =>
         val regex = """\([A-Z-]+\s\(\d+\s\d+\)(?:\s(?:\(\d+\s\d+\)|\w+))?\)""".r
         val commandList = regex.findAllIn(commands).toList

@@ -4,7 +4,7 @@ import scalafx.collections.ObservableBuffer
 import scalafx.scene.paint.Color
 import scalafx.scene.image.PixelWriter
 import Application.Main.{gc, AccentColor, canvas, coordinate_to_canvas}
-import Application.Commands.{CircleCommand, LineCommand, RectangleCommand}
+import Application.Commands.{CircleCommand, LineCommand, RectangleCommand, DrawCommand}
 
 
 private def draw_pixels_on_canvas(commands: ObservableBuffer[String]): Unit = {
@@ -46,6 +46,7 @@ private def draw_pixels_on_canvas(commands: ObservableBuffer[String]): Unit = {
     val rectangle_pattern = """(RectangleCommand)\(([^)]*)\)""".r
     val circle_pattern = """(CircleCommand)\(([^)]*)\)""".r
     val text_pattern = """(TextAtCommand)\(([^)]*)\)""".r
+    val draw_pattern = """(DrawCommand)\(([^)]*)\)""".r
 
     // Extract the command and parameters using pattern matching
     command match {
@@ -54,7 +55,7 @@ private def draw_pixels_on_canvas(commands: ObservableBuffer[String]): Unit = {
         val parameters = params.split(",").map(_.trim)
 
         val lineCommandInstance = LineCommand(parameters(0).toInt, parameters(1).toInt, parameters(2).toInt, parameters(3).toInt, parameters(4))
-        val array: Array[(Int, Int)] = lineCommandInstance.draw("Black")
+        val array: Array[(Int, Int)] = lineCommandInstance.draw()
 
         val pixelWriter: PixelWriter = gc.pixelWriter
         for (i <- array.indices) {
@@ -70,7 +71,7 @@ private def draw_pixels_on_canvas(commands: ObservableBuffer[String]): Unit = {
         // Print each parameter
         // parameters.foreach(println)
         val rectangleCommandInstance = RectangleCommand(parameters(0).toInt, parameters(1).toInt, parameters(2).toInt, parameters(3).toInt, parameters(4))
-        val array: Array[(Int, Int)] = rectangleCommandInstance.draw("Black")
+        val array: Array[(Int, Int)] = rectangleCommandInstance.draw()
 
         val pixelWriter: PixelWriter = gc.pixelWriter
         for (i <- array.indices) {
@@ -83,7 +84,7 @@ private def draw_pixels_on_canvas(commands: ObservableBuffer[String]): Unit = {
 
         val circleCommandInstance = CircleCommand(parameters(0).toInt, parameters(1).toInt, parameters(2).toInt, parameters(3))
 
-        val array: Array[(Int, Int)] = circleCommandInstance.draw("Black")
+        val array: Array[(Int, Int)] = circleCommandInstance.draw()
 
         val pixelWriter: PixelWriter = gc.pixelWriter
         for (i <- array.indices) {
@@ -102,6 +103,17 @@ private def draw_pixels_on_canvas(commands: ObservableBuffer[String]): Unit = {
 
         // Draw the text on the canvas at the specified position
         gc.fillText(text, map_x, map_y)
+
+      case draw_pattern(color, commands) =>
+        val commandList: Array[String] = commands.split(";").map(_.trim)
+        // Split the parameters by commas and trim any whitespace
+        val drawCommandInstance = DrawCommand(color, commandList)
+        val array: Array[(Int, Int)] = drawCommandInstance.draw()
+
+        val pixelWriter: PixelWriter = gc.pixelWriter
+        for (i <- array.indices) {
+          pixelWriter.setColor(array(i)._1, array(i)._2, colorConverter(drawCommandInstance.drawColor.toLowerCase()))
+        }
 
       case _ => println("Invalid command format")
 

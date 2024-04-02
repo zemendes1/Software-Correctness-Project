@@ -15,6 +15,7 @@ class FillCommand {
 
   def to_String(draw_color: String): String = s"FillCommand($color, $commands, $draw_color)"
 
+  // TODO: fill the commands with the given color
   def draw(color: Color): Unit = {
   }
 }
