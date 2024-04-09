@@ -25,18 +25,14 @@ object Main extends JFXApp3 {
   private val parsedCommands: ObservableBuffer[String] = ObservableBuffer[String]()
   private val executedCommands: ObservableBuffer[String] = ObservableBuffer[String]()
 
-  val canvas: Canvas = new Canvas(660, 660) // Has to be a multiple of |XMax - XMin| and |YMax - YMin|
+  val canvas: Canvas = new Canvas(600, 600) // Has to be a multiple of |XMax - XMin| and |YMax - YMin|
   val gc: GraphicsContext = canvas.graphicsContext2D
   private val font = new Font("Arial", 20)
 
-  // Window Space for the plotter
-  private val XMin: Int = -1
-  private val XMax: Int = 10
-  private val YMin: Int = -1
-  private val YMax: Int = 10
+  var first_command = false
 
   val coordinate_to_canvas = new CoordinateMapper
-  coordinate_to_canvas.init(canvas.getWidth.toInt, canvas.getHeight.toInt, XMin, XMax, YMin, YMax)
+  coordinate_to_canvas.canvas_init(canvas.getWidth.toInt, canvas.getHeight.toInt)
 
   override def start(): Unit =
     stage = new JFXApp3.PrimaryStage :
@@ -85,7 +81,7 @@ object Main extends JFXApp3 {
                 id = "commandTextArea"
                 promptText = "Enter commands here..."
                 prefHeight = 100
-                prefWidth = 800
+                prefWidth = 700
                 wrapText = true
               }
               val Button_Text: Button = new Button {
@@ -102,15 +98,32 @@ object Main extends JFXApp3 {
     val command = commandTextArea.getText
 
     val parsedCommand = CommandValidator().parseCommand(command, null)
-    if (parsedCommand != "") {
+
+    if(!first_command){
+      if (parsedCommand.contains("BoundingBoxCommand")){
+        commandValidityTextProperty.value = ""
+        commandValidityColorProperty.value = AccentColor
+        executedCommands += command
+        parsedCommands += parsedCommand
+      }
+      else{
+        commandValidityTextProperty.value = "The first command must be a BoundingBoxCommand"
+        commandValidityColorProperty.value = Color.Red
+        println("The first command must be a BoundingBoxCommand")
+      }
+    }
+    else{
+      if (parsedCommand != "" && !parsedCommand.contains("BoundingBoxCommand")) {
       commandValidityTextProperty.value = ""
       commandValidityColorProperty.value = AccentColor
       executedCommands += command
       parsedCommands +=  parsedCommand
-    } else {
+      }
+      else {
       commandValidityTextProperty.value = "Invalid command"
       commandValidityColorProperty.value = Color.Red
       println("Invalid command")
+      }
     }
     draw_pixels_on_canvas(parsedCommands)
   }

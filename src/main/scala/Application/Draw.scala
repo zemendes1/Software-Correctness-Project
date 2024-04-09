@@ -3,7 +3,7 @@ package Application
 import scalafx.collections.ObservableBuffer
 import scalafx.scene.paint.Color
 import scalafx.scene.image.PixelWriter
-import Application.Main.{gc, AccentColor, canvas, coordinate_to_canvas}
+import Application.Main.{gc, AccentColor, canvas, coordinate_to_canvas, first_command}
 import Application.Commands.{CircleCommand, LineCommand, RectangleCommand}
 
 
@@ -12,30 +12,10 @@ private def draw_pixels_on_canvas(commands: ObservableBuffer[String]): Unit = {
   // Clear canvas
   gc.clearRect(0, 0, gc.getCanvas.getWidth, gc.getCanvas.getHeight)
 
-  // Add limiting Perimeter
-  gc.setStroke(AccentColor)
-  gc.setLineWidth(2.0)
-  gc.strokeRect(0, 0, canvas.getWidth, canvas.getHeight)
-
-  // Draw grid
-  val gridSize = coordinate_to_canvas.mapToCanvasSpace(0, 0)._1 // 1 unit in coordinate space is gridSize in canvas space
-  gc.setStroke(Color.LightGray)
-  gc.setLineWidth(0.5)
-  // Draw vertical lines
-  for (i <- 0 until canvas.getWidth.toInt by gridSize) {
-    gc.strokeLine(i, 0, i, canvas.getHeight)
-  }
-  // Draw horizontal lines
-  for (i <- canvas.getHeight.toInt until 0 by -gridSize) {
-    gc.strokeLine(0, i, canvas.getWidth, i)
-  }
-
-  //Draw Axes
-  gc.setStroke(Color.Black)
-  gc.setLineWidth(2.0)
-  val origo = coordinate_to_canvas.mapToCanvasSpace(0, 0)
-  gc.strokeLine(0, origo(1), canvas.getWidth, origo(1))
-  gc.strokeLine(origo(0), 0, origo(0), canvas.getHeight)
+  var bounding_box_x_max = 0
+  var bounding_box_y_max = 0
+  var bounding_box_x_min = 0
+  var bounding_box_y_min = 0
 
   // Run trough commands
   for (command <- commands) {
@@ -45,10 +25,7 @@ private def draw_pixels_on_canvas(commands: ObservableBuffer[String]): Unit = {
     val rectangle_pattern = """(RectangleCommand)\(([^)]*)\)""".r
     val circle_pattern = """(CircleCommand)\(([^)]*)\)""".r
     val text_pattern = """(TextAtCommand)\(([^)]*)\)""".r
-
-    // TODO
-    //val fill_pattern =
-    //val bounding_box_pattern =
+    val bounding_box_pattern = """(BoundingBoxCommand)\(([^)]*)\)""".r
 
     // Extract the command and parameters using pattern matching
     command match {
@@ -105,13 +82,72 @@ private def draw_pixels_on_canvas(commands: ObservableBuffer[String]): Unit = {
         // Draw the text on the canvas at the specified position
         gc.fillText(text, map_x, map_y)
 
-      // TODO
-      //case fill_pattern() =>
-      //case bounding_box_pattern() =>
-
+      case bounding_box_pattern(command, params) =>
+        val parameters = params.split(",").map(_.trim)
+        bounding_box_x_min = parameters(0).toInt
+        bounding_box_y_min = parameters(1).toInt
+        bounding_box_x_max = parameters(2).toInt
+        bounding_box_y_max = parameters(3).toInt
+        coordinate_to_canvas.init(parameters(0).toInt, parameters(2).toInt, parameters(1).toInt, parameters(3).toInt)
+        coordinate_to_canvas.gridSize()
+        first_command = true
 
       case _ => println("Draw Error")
 
+    }
+  }
+
+  if (first_command) {
+    val (gridSize_X, gridSize_Y) = coordinate_to_canvas.gridSize() // 1 unit in coordinate space is gridSize in canvas space
+
+    // Clean everything outside bounding box
+    gc.clearRect(0, 0, gc.getCanvas.getWidth, (coordinate_to_canvas.windowYMax - bounding_box_y_max) * gridSize_Y)
+    gc.clearRect(gridSize_Y*bounding_box_y_max, 0,(coordinate_to_canvas.windowXMax - bounding_box_x_max) * gridSize_Y, gc.getCanvas.getHeight)
+
+
+
+    // Draw grid
+    gc.setStroke(Color.LightGray)
+    gc.setLineWidth(0.5)
+    // Draw vertical lines
+    for (i <- 0 until canvas.getWidth.toInt by gridSize_X) {
+      gc.strokeLine(i, 0, i, canvas.getHeight)
+    }
+    // Draw horizontal lines
+    for (i <- canvas.getHeight.toInt until 0 by -gridSize_Y) {
+      gc.strokeLine(0, i, canvas.getWidth, i)
+    }
+
+    //Draw Axis
+    gc.setStroke(Color.Black)
+    gc.setLineWidth(2.0)
+    val origo = coordinate_to_canvas.mapToCanvasSpace(0, 0)
+    gc.strokeLine(0, origo(1), canvas.getWidth, origo(1))
+    gc.strokeLine(origo(0), 0, origo(0), canvas.getHeight)
+
+    // Add limiting Perimeter
+    gc.setStroke(AccentColor)
+    gc.setLineWidth(2.0)
+    gc.strokeRect(0, 0, canvas.getWidth, canvas.getHeight)
+  }
+  else{
+    // Create a Dummy Grid
+
+    // Add limiting Perimeter
+    gc.setStroke(AccentColor)
+    gc.setLineWidth(2.0)
+    gc.strokeRect(0, 0, canvas.getWidth, canvas.getHeight)
+
+    // Draw grid
+    gc.setStroke(Color.LightGray)
+    gc.setLineWidth(0.5)
+    // Draw vertical lines
+    for (i <- 0 until canvas.getWidth.toInt by 30) {
+      gc.strokeLine(i, 0, i, canvas.getHeight)
+    }
+    // Draw horizontal lines
+    for (i <- canvas.getHeight.toInt until 0 by -30) {
+      gc.strokeLine(0, i, canvas.getWidth, i)
     }
   }
 }
