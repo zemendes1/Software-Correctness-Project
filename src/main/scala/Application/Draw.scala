@@ -17,8 +17,12 @@ private def draw_pixels_on_canvas(commands: ObservableBuffer[String]): Unit = {
   var bounding_box_x_min = 0
   var bounding_box_y_min = 0
 
+  val commands_list =  commands.toList
+  var iterator = commands.toList.iterator
+
   // Run trough commands
-  for (command <- commands) {
+  while (iterator.hasNext) {
+    val command = iterator.next()
 
     // Define a regular expression pattern to match the command and its parameters
     val line_pattern = """(LineCommand)\(([^)]*)\)""".r
@@ -26,6 +30,7 @@ private def draw_pixels_on_canvas(commands: ObservableBuffer[String]): Unit = {
     val circle_pattern = """(CircleCommand)\(([^)]*)\)""".r
     val text_pattern = """(TextAtCommand)\(([^)]*)\)""".r
     val bounding_box_pattern = """(BoundingBoxCommand)\(([^)]*)\)""".r
+    val draw_pattern = """(DrawCommand)\((.*?)\)""".r
 
     // Extract the command and parameters using pattern matching
     command match {
@@ -41,13 +46,9 @@ private def draw_pixels_on_canvas(commands: ObservableBuffer[String]): Unit = {
         }
 
       case rectangle_pattern(command, params) =>
-        // println(s"Command: $command")
-
         // Split the parameters by commas and trim any whitespace
         val parameters = params.split(",").map(_.trim)
 
-        // Print each parameter
-        // parameters.foreach(println)
         val rectangleCommandInstance = RectangleCommand(parameters(0).toInt, parameters(1).toInt, parameters(2).toInt, parameters(3).toInt, parameters(4))
         val array: Array[(Int, Int)] = rectangleCommandInstance.draw("Black")
 
@@ -92,6 +93,21 @@ private def draw_pixels_on_canvas(commands: ObservableBuffer[String]): Unit = {
         coordinate_to_canvas.gridSize()
         first_command = true
 
+      case draw_pattern(command, params) =>
+        val parameters = params.split(", ").map(_.trim)
+
+        // Clean the First parameter
+        parameters(0) = parameters(0).replace("List((", "(")
+        // Clean the penultimate parameter
+        parameters(parameters.length-2) = parameters(parameters.length-2).replace("))", ")")
+        // Save last parameter which is the color
+        val color = Color_Caps(parameters(parameters.length-1))
+
+        for (i <- 0 until parameters.length-1) {
+          val parsedCommand = CommandValidator().parseCommand(parameters(i), color)
+          iterator = iterator ++ Iterator(parsedCommand)
+        }
+
       case _ => println("Draw Error")
 
     }
@@ -103,8 +119,6 @@ private def draw_pixels_on_canvas(commands: ObservableBuffer[String]): Unit = {
     // Clean everything outside bounding box
     gc.clearRect(0, 0, gc.getCanvas.getWidth, (coordinate_to_canvas.windowYMax - bounding_box_y_max) * gridSize_Y)
     gc.clearRect(gridSize_Y*bounding_box_y_max, 0,(coordinate_to_canvas.windowXMax - bounding_box_x_max) * gridSize_Y, gc.getCanvas.getHeight)
-
-
 
     // Draw grid
     gc.setStroke(Color.LightGray)
@@ -121,9 +135,9 @@ private def draw_pixels_on_canvas(commands: ObservableBuffer[String]): Unit = {
     //Draw Axis
     gc.setStroke(Color.Black)
     gc.setLineWidth(2.0)
-    val origo = coordinate_to_canvas.mapToCanvasSpace(0, 0)
-    gc.strokeLine(0, origo(1), canvas.getWidth, origo(1))
-    gc.strokeLine(origo(0), 0, origo(0), canvas.getHeight)
+    val origin = coordinate_to_canvas.mapToCanvasSpace(0, 0)
+    gc.strokeLine(0, origin(1), canvas.getWidth, origin(1))
+    gc.strokeLine(origin(0), 0, origin(0), canvas.getHeight)
 
     // Add limiting Perimeter
     gc.setStroke(AccentColor)
@@ -132,7 +146,6 @@ private def draw_pixels_on_canvas(commands: ObservableBuffer[String]): Unit = {
   }
   else{
     // Create a Dummy Grid
-
     // Add limiting Perimeter
     gc.setStroke(AccentColor)
     gc.setLineWidth(2.0)

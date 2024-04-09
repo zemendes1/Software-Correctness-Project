@@ -17,3 +17,20 @@ private def colorConverter(text: String): Color = {
     case _ => Color.Black
   }
 }
+
+private def Color_Caps(text: String): String = {
+  text match {
+    case "black" => "Black"
+    case "white" => "White"
+    case "red" => "Red"
+    case "green" => "Green"
+    case "yellow" => "Yellow"
+    case "blue" => "Blue"
+    case "brown" => "Brown"
+    case "orange" => "Orange"
+    case "pink" => "Pink"
+    case "purple" => "Purple"
+    case "gray" => "Gray"
+    case _ => "Black"
+  }
+}

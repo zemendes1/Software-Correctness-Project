@@ -72,8 +72,7 @@ class CommandValidator {
           parsedCommand = parseCommand(command, color)
         } yield parsedCommand
 
-        val DrawCommandInstance = new DrawCommand()
-        DrawCommandInstance.init(color, commandList)
+        val DrawCommandInstance = new DrawCommand(color, commandList)
         val stringRepresentation: String = DrawCommandInstance.to_String(draw_Color)
         stringRepresentation
 
