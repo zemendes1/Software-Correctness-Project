@@ -31,6 +31,7 @@ private def draw_pixels_on_canvas(commands: ObservableBuffer[String]): Unit = {
     val text_pattern = """(TextAtCommand)\(([^)]*)\)""".r
     val bounding_box_pattern = """(BoundingBoxCommand)\(([^)]*)\)""".r
     val draw_pattern = """(DrawCommand)\((.*?)\)""".r
+    val fill_pattern = """(FillCommand)\((.*?)\)""".r
 
     // Extract the command and parameters using pattern matching
     command match {
@@ -107,6 +108,10 @@ private def draw_pixels_on_canvas(commands: ObservableBuffer[String]): Unit = {
           val parsedCommand = CommandValidator().parseCommand(parameters(i), color)
           iterator = iterator ++ Iterator(parsedCommand)
         }
+
+      case fill_pattern(command, params) =>
+        print(command,params)
+        println()
 
       case _ => println("Draw Error")
 

@@ -1,8 +1,6 @@
 package Application
 
-import Application.Commands.{BoundingBoxCommand, CircleCommand, DrawCommand, FillCommand, LineCommand, RectangleCommand, TextAtCommand}
-import scalafx.scene.paint.Color
-import scalafx.Includes.string2sfxColor
+import Application.Commands.*
 
 trait Command
 
@@ -72,16 +70,24 @@ class CommandValidator {
           parsedCommand = parseCommand(command, color)
         } yield parsedCommand
 
-        val DrawCommandInstance = new DrawCommand(color, commandList)
+        val DrawCommandInstance = DrawCommand(color, commandList)
         val stringRepresentation: String = DrawCommandInstance.to_String(draw_Color)
         stringRepresentation
 
-      case fillPattern(color, command) if allowedColors.contains(color.toLowerCase) =>
+      case fillPattern(color, commands) if allowedColors.contains(color.toLowerCase) =>
+        val regex = """\([A-Z-]+\s\(\d+\s\d+\)(?:\s(?:\(\d+\s\d+\)|\w+))?\)""".r
+        val commandList = regex.findAllIn(commands).toList
 
-        val fillCommandInstance = new FillCommand()
-        fillCommandInstance.init(color, command)
+        // Check if the commands are valid
+        commandList.foreach(parseCommand(_, color))
+
+        var parsedCommandList: List[String] = for {
+          command <- commandList
+          parsedCommand = parseCommand(command, color)
+        } yield parsedCommand
+        
+        val fillCommandInstance = FillCommand(color, commandList)
         val stringRepresentation: String = fillCommandInstance.to_String(draw_Color)
-        parseCommand(command, color)
         stringRepresentation
 
       case _ =>
