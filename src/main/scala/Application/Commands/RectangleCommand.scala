@@ -7,7 +7,7 @@ case class RectangleCommand(x1: Int, y1: Int, x2: Int, y2: Int, drawColor: Strin
 
   def to_String: String = s"RectangleCommand($x1, $y1, $x2, $y2, $drawColor, $fill)"
 
-  def draw(color: String): Array[(Int, Int)] = {
+  def draw(): Array[(Int, Int)] = {
     // Your drawing logic using drawColor
     // starts adding leftSide to points
     if (fill) {
@@ -27,10 +27,10 @@ case class RectangleCommand(x1: Int, y1: Int, x2: Int, y2: Int, drawColor: Strin
       }
       points.toArray
     } else {
-      val leftSide = LineCommand(x1, y1, x1, y2, drawColor).draw(color)
-      val rightSide = LineCommand(x2, y1, x2, y2, drawColor).draw(color)
-      val bottomSide = LineCommand(x1, y1, x2, y1, drawColor).draw(color)
-      val topSide = LineCommand(x1, y2, x2, y2, drawColor).draw(color)
+      val leftSide = LineCommand(x1, y1, x1, y2, drawColor).draw()
+      val rightSide = LineCommand(x2, y1, x2, y2, drawColor).draw()
+      val bottomSide = LineCommand(x1, y1, x2, y1, drawColor).draw()
+      val topSide = LineCommand(x1, y2, x2, y2, drawColor).draw()
       // points to return should be an array of (x, y)
       leftSide ++ rightSide ++ bottomSide ++ topSide
     }

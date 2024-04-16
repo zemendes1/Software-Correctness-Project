@@ -39,7 +39,7 @@ private def draw_pixels_on_canvas(commands: ObservableBuffer[String]): Unit = {
         val parameters = params.split(",").map(_.trim)
 
         val lineCommandInstance = LineCommand(parameters(0).toInt, parameters(1).toInt, parameters(2).toInt, parameters(3).toInt, parameters(4))
-        val array: Array[(Int, Int)] = lineCommandInstance.draw("Black")
+        val array: Array[(Int, Int)] = lineCommandInstance.draw()
 
         val pixelWriter: PixelWriter = gc.pixelWriter
         for (i <- array.indices) {
@@ -52,7 +52,7 @@ private def draw_pixels_on_canvas(commands: ObservableBuffer[String]): Unit = {
         val fill = Option(parameters(5).toBoolean).getOrElse(false)
 
         val rectangleCommandInstance = RectangleCommand(parameters(0).toInt, parameters(1).toInt, parameters(2).toInt, parameters(3).toInt, parameters(4), fill) //FIXME: Fix the fill
-        val array: Array[(Int, Int)] = rectangleCommandInstance.draw("Black")
+        val array: Array[(Int, Int)] = rectangleCommandInstance.draw()
 
         val pixelWriter: PixelWriter = gc.pixelWriter
         for (i <- array.indices) {
