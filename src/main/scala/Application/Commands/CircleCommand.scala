@@ -1,15 +1,14 @@
 package Application.Commands
 import Application.Main.coordinate_to_canvas
 
-case class CircleCommand(x: Int, y: Int, radius: Int, drawColor: String) {
+case class CircleCommand(x: Int, y: Int, radius: Int, drawColor: String, fill: Boolean = false) {
 
   def print(): Unit = println(s"CircleCommand($x, $y, $radius)")
 
-  def to_String(draw_color: String): String = s"CircleCommand($x, $y, $radius, $draw_color)"
+  def to_String(draw_color: String): String = s"CircleCommand($x, $y, $radius, $draw_color, $fill)"
 
 
   def draw(color: String): Array[(Int, Int)] = {
-
     val point = coordinate_to_canvas.mapToCanvasSpace_radius(x, y, radius)
     val converted_x = point._1
     val converted_y = point._2
@@ -39,7 +38,15 @@ case class CircleCommand(x: Int, y: Int, radius: Int, drawColor: String) {
         delta += 2 * (p._2 - p._1 + 1)
       }
     }
-
+    if (fill) {
+      for (x <- (converted_x - converted_radius) to (converted_x + converted_radius)) {
+        for (y <- (converted_y - converted_radius) to (converted_y + converted_radius)) {
+          if (Math.pow(x - converted_x, 2) + Math.pow(y - converted_y, 2) <= Math.pow(converted_radius, 2)) {
+            points = points :+ (x, y)
+          }
+        }
+      }
+    }
     points.toArray
   }
 }

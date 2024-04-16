@@ -31,6 +31,7 @@ private def draw_pixels_on_canvas(commands: ObservableBuffer[String]): Unit = {
     val text_pattern = """(TextAtCommand)\(([^)]*)\)""".r
     val bounding_box_pattern = """(BoundingBoxCommand)\(([^)]*)\)""".r
     val draw_pattern = """(DrawCommand)\((.*?)\)""".r
+    val fill_pattern = """(FillCommand)\((.*?)\)""".r
 
     // Extract the command and parameters using pattern matching
     command match {
@@ -48,8 +49,9 @@ private def draw_pixels_on_canvas(commands: ObservableBuffer[String]): Unit = {
       case rectangle_pattern(command, params) =>
         // Split the parameters by commas and trim any whitespace
         val parameters = params.split(",").map(_.trim)
+        val fill = Option(parameters(5).toBoolean).getOrElse(false)
 
-        val rectangleCommandInstance = RectangleCommand(parameters(0).toInt, parameters(1).toInt, parameters(2).toInt, parameters(3).toInt, parameters(4))
+        val rectangleCommandInstance = RectangleCommand(parameters(0).toInt, parameters(1).toInt, parameters(2).toInt, parameters(3).toInt, parameters(4), fill) //FIXME: Fix the fill
         val array: Array[(Int, Int)] = rectangleCommandInstance.draw("Black")
 
         val pixelWriter: PixelWriter = gc.pixelWriter
@@ -60,8 +62,8 @@ private def draw_pixels_on_canvas(commands: ObservableBuffer[String]): Unit = {
       case circle_pattern(command, params) =>
         // Split the parameters by commas and trim any whitespace
         val parameters = params.split(",").map(_.trim)
-
-        val circleCommandInstance = CircleCommand(parameters(0).toInt, parameters(1).toInt, parameters(2).toInt, parameters(3))
+        val fill = Option(parameters(4).toBoolean).getOrElse(false)
+        val circleCommandInstance = CircleCommand(parameters(0).toInt, parameters(1).toInt, parameters(2).toInt, parameters(3), fill) //FIXME: Fix the fill
 
         val array: Array[(Int, Int)] = circleCommandInstance.draw("Black")
 
@@ -105,6 +107,16 @@ private def draw_pixels_on_canvas(commands: ObservableBuffer[String]): Unit = {
 
         for (i <- 0 until parameters.length-1) {
           val parsedCommand = CommandValidator().parseCommand(parameters(i), color)
+          iterator = iterator ++ Iterator(parsedCommand)
+        }
+
+      case fill_pattern(command, params) =>
+        val parameters = params.split(", ").map(_.trim)
+        parameters(0) = parameters(0).replace("List((", "(")
+        parameters(parameters.length-2) = parameters(parameters.length-2).replace("))", ")")
+        val color = Color_Caps(parameters(parameters.length-1))
+        for (i <- 0 until parameters.length-1) {
+          val parsedCommand = CommandValidator().parseCommand(parameters(i), color, fill = true)
           iterator = iterator ++ Iterator(parsedCommand)
         }
 

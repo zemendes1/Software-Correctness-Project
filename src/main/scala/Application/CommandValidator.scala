@@ -11,7 +11,7 @@ class CommandValidator {
   private val allowedColors: Set[String] = Set("black", "white", "red", "green", "yellow", "blue", "brown", "orange", "pink", "purple", "gray")
 
   private var draw_Color: String = "Black"
-  def parseCommand(command: String, painting_color: String): String = {
+  def parseCommand(command: String, painting_color: String, fill: Boolean = false): String = {
     // Regular expressions to match the valid command formats
     val linePattern = """\(LINE \((\d+) (\d+)\) \((\d+) (\d+)\)\)""".r
     val rectanglePattern = """\(RECTANGLE \((\d+) (\d+)\) \((\d+) (\d+)\)\)""".r
@@ -34,7 +34,7 @@ class CommandValidator {
 
         draw_Color = Option(painting_color).getOrElse("Black")
 
-        val rectangleCommandInstance =  RectangleCommand(x1.toInt, y1.toInt, x2.toInt, y2.toInt, draw_Color)
+        val rectangleCommandInstance =  RectangleCommand(x1.toInt, y1.toInt, x2.toInt, y2.toInt, draw_Color, fill)
         val stringRepresentation : String = rectangleCommandInstance.to_String
         stringRepresentation
 
@@ -42,7 +42,7 @@ class CommandValidator {
 
         draw_Color = Option(painting_color).getOrElse("Black")
 
-        val circleCommandInstance =  CircleCommand(x.toInt, y.toInt, radius.toInt, draw_Color)
+        val circleCommandInstance =  CircleCommand(x.toInt, y.toInt, radius.toInt, draw_Color, fill)
         val stringRepresentation: String = circleCommandInstance.to_String(draw_Color)
         stringRepresentation
 
@@ -65,23 +65,31 @@ class CommandValidator {
         val commandList = regex.findAllIn(commands).toList
 
         // Check if the commands are valid
-        commandList.foreach(parseCommand(_, color))
+        commandList.foreach(parseCommand(_, color, fill))
 
         var parsedCommandList: List[String] = for {
           command <- commandList
-          parsedCommand = parseCommand(command, color)
+          parsedCommand = parseCommand(command, color, fill)
         } yield parsedCommand
 
         val DrawCommandInstance = new DrawCommand(color, commandList)
         val stringRepresentation: String = DrawCommandInstance.to_String(draw_Color)
         stringRepresentation
 
-      case fillPattern(color, command) if allowedColors.contains(color.toLowerCase) =>
+      case fillPattern(color, commands) if allowedColors.contains(color.toLowerCase) =>
+        val regex = """\([A-Z-]+\s\(\d+\s\d+\)(?:\s(?:\(\d+\s\d+\)|\w+))?\)""".r
+        val commandList = regex.findAllIn(commands).toList
 
-        val fillCommandInstance = new FillCommand()
-        fillCommandInstance.init(color, command)
-        val stringRepresentation: String = fillCommandInstance.to_String(draw_Color)
-        parseCommand(command, color)
+        // Check if the commands are valid
+        commandList.foreach(parseCommand(_, color, fill))
+
+        var parsedCommandList: List[String] = for {
+          command <- commandList
+          parsedCommand = parseCommand(command, color, true)
+        } yield parsedCommand
+
+        val FillCommandInstance = new FillCommand(color, commandList)
+        val stringRepresentation: String = FillCommandInstance.to_String(draw_Color)
         stringRepresentation
 
       case _ =>
