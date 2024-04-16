@@ -1,8 +1,6 @@
 package Application
 
-import Application.Commands.{BoundingBoxCommand, CircleCommand, DrawCommand, FillCommand, LineCommand, RectangleCommand, TextAtCommand}
-import scalafx.scene.paint.Color
-import scalafx.Includes.string2sfxColor
+import Application.Commands.*
 
 trait Command
 
@@ -72,7 +70,7 @@ class CommandValidator {
           parsedCommand = parseCommand(command, color, fill)
         } yield parsedCommand
 
-        val DrawCommandInstance = new DrawCommand(color, commandList)
+        val DrawCommandInstance = DrawCommand(color, commandList)
         val stringRepresentation: String = DrawCommandInstance.to_String(draw_Color)
         stringRepresentation
 

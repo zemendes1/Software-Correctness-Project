@@ -119,6 +119,8 @@ private def draw_pixels_on_canvas(commands: ObservableBuffer[String]): Unit = {
           val parsedCommand = CommandValidator().parseCommand(parameters(i), color, fill = true)
           iterator = iterator ++ Iterator(parsedCommand)
         }
+        print(command,params)
+        println()
 
       case _ => println("Draw Error")
 
