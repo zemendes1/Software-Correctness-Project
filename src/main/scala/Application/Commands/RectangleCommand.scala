@@ -1,6 +1,5 @@
 package Application.Commands
 import Application.Main.coordinate_to_canvas
-import scalafx.scene.paint.Color
 
 case class RectangleCommand(x1: Int, y1: Int, x2: Int, y2: Int, drawColor: String, fill: Boolean = false) {
   def print(): Unit = println(s"RectangleCommand($x1, $y1, $x2, $y2)")
