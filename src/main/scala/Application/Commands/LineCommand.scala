@@ -3,12 +3,11 @@ import Application.Main.coordinate_to_canvas
 
 case class LineCommand(x1: Int, y1: Int, x2: Int, y2: Int, drawColor: String) {
 
-  private val numPoints = 1000
   def print(): Unit = println(s"LineCommand($x1, $y1, $x2, $y2)")
 
   def to_String(draw_color: String): String = s"LineCommand($x1, $y1, $x2, $y2, $draw_color)"
 
-  def draw(color : String): Array[(Int, Int)] = {
+  def draw(): Array[(Int, Int)] = {
     val point_1 = coordinate_to_canvas.mapToCanvasSpace(x1, y1)
     val point_2 = coordinate_to_canvas.mapToCanvasSpace(x2, y2)
 
