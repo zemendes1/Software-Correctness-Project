@@ -14,15 +14,11 @@ case class RectangleCommand(x1: Int, y1: Int, x2: Int, y2: Int, drawColor: Strin
       val point_1 = coordinate_to_canvas.mapToCanvasSpace(x1, y1)
       val point_2 = coordinate_to_canvas.mapToCanvasSpace(x2, y2)
       var points: List [(Int, Int)] = List()
-      for (x <- point_1._1 to point_2._1) {
-        if (point_1._2 > point_2._2) {
-          for (y <- point_1._2 to point_2._2 by -1) {
-            points = points :+ (x, y)
-          }
-        } else {
-          for (y <- point_1._2 to point_2._2) {
-            points = points :+ (x, y)
-          }
+      val sx = if (point_1._1 < point_2._1) 1 else -1
+      val sy = if (point_1._2 < point_2._2) 1 else -1
+      for (x <- point_1._1 to point_2._1 by sx) {
+        for (y <- point_1._2 to point_2._2 by sy) {
+          points = points :+ (x, y)
         }
       }
       points.toArray
