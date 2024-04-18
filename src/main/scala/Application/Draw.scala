@@ -51,7 +51,7 @@ private def draw_pixels_on_canvas(commands: ObservableBuffer[String]): Unit = {
         val parameters = params.split(",").map(_.trim)
         val fill = Option(parameters(5).toBoolean).getOrElse(false)
 
-        val rectangleCommandInstance = RectangleCommand(parameters(0).toInt, parameters(1).toInt, parameters(2).toInt, parameters(3).toInt, parameters(4), fill) //FIXME: Fix the fill
+        val rectangleCommandInstance = RectangleCommand(parameters(0).toInt, parameters(1).toInt, parameters(2).toInt, parameters(3).toInt, parameters(4), fill)
         val array: Array[(Int, Int)] = rectangleCommandInstance.draw()
 
         val pixelWriter: PixelWriter = gc.pixelWriter
@@ -63,7 +63,7 @@ private def draw_pixels_on_canvas(commands: ObservableBuffer[String]): Unit = {
         // Split the parameters by commas and trim any whitespace
         val parameters = params.split(",").map(_.trim)
         val fill = Option(parameters(4).toBoolean).getOrElse(false)
-        val circleCommandInstance = CircleCommand(parameters(0).toInt, parameters(1).toInt, parameters(2).toInt, parameters(3), fill) //FIXME: Fix the fill
+        val circleCommandInstance = CircleCommand(parameters(0).toInt, parameters(1).toInt, parameters(2).toInt, parameters(3), fill)
 
         val array: Array[(Int, Int)] = circleCommandInstance.draw("Black")
 
