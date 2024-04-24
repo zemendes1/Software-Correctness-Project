@@ -15,7 +15,7 @@ import org.sireum._
 
 @pure def absoluteValue(num: Z): Z = {
   Contract(
-    Ensures(Res == num || Res == -num),
+    Ensures((Res == num || Res == -num) & (Res >= 0))
   )
   var res : Z = 0
 
@@ -27,13 +27,14 @@ import org.sireum._
     Deduce(|- (num >= 0))
     res = num
   }
+  Deduce(|- ((res == num || res == -num) & (res >= 0)))
   return res
 }
 
 @pure def draw(x1:Z, y1:Z, x2:Z, y2:Z, canvasWidth:Z, canvasHeight:Z,
                windowXMax:Z, windowYMax : Z, windowXMin:Z , windowYMin :Z): ISZ[ISZ[Z]] = {
   Contract(
-    Requires(windowXMax > windowXMin & windowYMax > windowYMin, canvasWidth > 0, canvasHeight > 0)
+    Requires(windowXMax > windowXMin & windowYMax > windowYMin, canvasWidth > 0, canvasHeight > 0),
   )
   val point_1 = mapToCanvasSpace(x1, y1, canvasWidth, canvasHeight, windowXMax, windowYMax, windowXMin, windowYMin)
   val point_2 = mapToCanvasSpace(x2, y2, canvasWidth, canvasHeight, windowXMax, windowYMax, windowXMin, windowYMin)
@@ -65,15 +66,11 @@ import org.sireum._
 
   var err = dx - dy
 
-  while (true) {
+  while (x != point_2._1 | y != point_2._2) {
     Invariant(
       Modifies(points, err, x, y),
     )
     points = points :+ ISZ(x, y)
-
-    if (x == point_2._1 && y == point_2._2) {
-      return points
-    }
 
     val e2 = 2 * err
 

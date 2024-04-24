@@ -24,12 +24,8 @@ case class LineCommand(x1: Int, y1: Int, x2: Int, y2: Int, drawColor: String) {
 
     var err = dx - dy
 
-    while (true) {
+    while (x != point_2._1 || y != point_2._2) {
       points = points :+ (x, y)
-
-      if (x == point_2._1 && y == point_2._2) {
-        return points
-      }
 
       val e2 = 2 * err
 
@@ -44,7 +40,7 @@ case class LineCommand(x1: Int, y1: Int, x2: Int, y2: Int, drawColor: String) {
       }
     }
 
-    points
+    return points
   }
 
 }
