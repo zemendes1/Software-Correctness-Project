@@ -35,11 +35,13 @@ import org.sireum._
                windowXMax:Z, windowYMax : Z, windowXMin:Z , windowYMin :Z): ISZ[ISZ[Z]] = {
   Contract(
     Requires(windowXMax > windowXMin & windowYMax > windowYMin, canvasWidth > 0, canvasHeight > 0),
+    //Ensures (false == Exists(0 until Res.size)(i => Res(i)(0) < x1 & Res(i)(1) < x2))
   )
   val point_1 = mapToCanvasSpace(x1, y1, canvasWidth, canvasHeight, windowXMax, windowYMax, windowXMin, windowYMin)
   val point_2 = mapToCanvasSpace(x2, y2, canvasWidth, canvasHeight, windowXMax, windowYMax, windowXMin, windowYMin)
 
-  var points : ISZ[ISZ[Z]] = ISZ(ISZ())
+  var points : ISZ[ISZ[Z]] = ISZ()
+  Deduce(|- (points.size == 0))
 
   var x = point_1._1
   var y = point_1._2
@@ -63,6 +65,8 @@ import org.sireum._
   else{
     sy = -1
   }
+  Deduce(|- (sx == 1 || sx == -1))
+  Deduce(|- (sy == 1 || sy == -1))
 
   var err = dx - dy
 
@@ -70,7 +74,9 @@ import org.sireum._
     Invariant(
       Modifies(points, err, x, y),
     )
+    Deduce(|- (ISZ(x, y).size == 2))
     points = points :+ ISZ(x, y)
+    Deduce(|- (All(0 until points.size)(i => points(i).size == 2)))
 
     val e2 = 2 * err
 
@@ -84,6 +90,8 @@ import org.sireum._
       y = y + sy
     }
   }
-
+  Deduce(|- (points.size >= 0))
+  
+  Deduce(|- (! Exists(0 until points.size)(i => points(i)(0) < x1 & points(i)(1) < x2)))
   return points
 }
