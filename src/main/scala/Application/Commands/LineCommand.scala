@@ -46,9 +46,6 @@ case class LineCommand(x1: Int, y1: Int, x2: Int, y2: Int, drawColor: String) {
     }
 
     while (x <= x_upper_bound && x >= x_lower_bound && y <= y_upper_bound  && y >= y_lower_bound) {
-      println(x)
-      println(y)
-      println()
       points = points :+ (x, y)
 
       val e2 = 2 * err
