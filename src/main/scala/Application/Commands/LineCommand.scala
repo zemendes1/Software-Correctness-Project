@@ -24,7 +24,31 @@ case class LineCommand(x1: Int, y1: Int, x2: Int, y2: Int, drawColor: String) {
 
     var err = dx - dy
 
-    while (x != point_2._1 || y != point_2._2) {
+    var x_upper_bound = 0
+    var x_lower_bound = 0
+    var y_upper_bound = 0
+    var y_lower_bound = 0
+
+    if(point_1._1 < point_2._1) {
+      x_upper_bound = point_2._1
+      x_lower_bound = point_1._1
+    } else {
+      x_upper_bound = point_1._1
+      x_lower_bound = point_2._1
+    }
+
+    if(point_1._2 < point_2._2) {
+      y_upper_bound = point_2._2
+      y_lower_bound = point_1._2
+    } else {
+      y_upper_bound = point_1._2
+      y_lower_bound = point_2._2
+    }
+
+    while (x <= x_upper_bound && x >= x_lower_bound && y <= y_upper_bound  && y >= y_lower_bound) {
+      println(x)
+      println(y)
+      println()
       points = points :+ (x, y)
 
       val e2 = 2 * err

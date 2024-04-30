@@ -4,11 +4,17 @@ import org.sireum._
 @pure def mapToCanvasSpace(xWindow: Z, yWindow: Z, canvasWidth: Z, canvasHeight: Z,
                            windowXMax:Z, windowYMax : Z, windowXMin:Z , windowYMin :Z): (Z, Z) = {
   Contract(
-    Requires(windowXMax > windowXMin & windowYMax > windowYMin, canvasWidth >0, canvasHeight > 0)
+    Requires(windowXMax > windowXMin & windowYMax > windowYMin, canvasWidth >0, canvasHeight > 0,
+      xWindow >= windowXMin & xWindow <= windowXMax, yWindow >= windowYMin & yWindow <= windowYMax),
+    Ensures(Res._1 <= canvasWidth, Res._2 <= canvasHeight, Res._1 >= 0, Res._2 >= 0)
   )
   Deduce (|- (windowXMax - windowXMin > 0))
+  Deduce (|- (windowYMax - windowYMin > 0))
+
   val xCanvas = ((xWindow - windowXMin) / (windowXMax - windowXMin)) * canvasWidth
+  Deduce (|- (xCanvas <= canvasWidth & xCanvas >= 0))
   val yCanvas = canvasHeight - ((yWindow - windowYMin) / (windowYMax - windowYMin)) * canvasHeight
+  Deduce (|- (yCanvas <= canvasHeight & yCanvas >= 0))
 
   return (xCanvas, yCanvas)
 }
@@ -34,11 +40,15 @@ import org.sireum._
 @pure def draw(x1:Z, y1:Z, x2:Z, y2:Z, canvasWidth:Z, canvasHeight:Z,
                windowXMax:Z, windowYMax : Z, windowXMin:Z , windowYMin :Z): ISZ[ISZ[Z]] = {
   Contract(
-    Requires(windowXMax > windowXMin & windowYMax > windowYMin, canvasWidth > 0, canvasHeight > 0),
-    //Ensures (false == Exists(0 until Res.size)(i => Res(i)(0) < x1 & Res(i)(1) < x2))
+    Requires(windowXMax > windowXMin & windowYMax > windowYMin, canvasWidth > 0, canvasHeight > 0,
+      x1 >= windowXMin & x1 <= windowXMax, y1 >= windowYMin & y1 <= windowYMax,
+      x2 >= windowXMin & x2 <= windowXMax, y2 >= windowYMin & y2 <= windowYMax),
+    Ensures (All(0 until Res.size)(j => All(Res(j).indices)(i => Res(j)(i) >= 0)))
   )
   val point_1 = mapToCanvasSpace(x1, y1, canvasWidth, canvasHeight, windowXMax, windowYMax, windowXMin, windowYMin)
   val point_2 = mapToCanvasSpace(x2, y2, canvasWidth, canvasHeight, windowXMax, windowYMax, windowXMin, windowYMin)
+  Deduce(|- (point_1._1 <= canvasWidth & point_1._2 <= canvasHeight))
+  Deduce(|- (point_2._1 <= canvasWidth & point_2._2 <= canvasHeight))
 
   var points : ISZ[ISZ[Z]] = ISZ()
   Deduce(|- (points.size == 0))
@@ -70,13 +80,40 @@ import org.sireum._
 
   var err = dx - dy
 
-  while (x != point_2._1 | y != point_2._2) {
+  var x_upper_bound = 0
+  var x_lower_bound = 0
+  var y_upper_bound = 0
+  var y_lower_bound = 0
+
+  if (point_1._1 < point_2._1) {
+    x_upper_bound = point_2._1
+    x_lower_bound = point_1._1
+  } else {
+    x_upper_bound = point_1._1
+    x_lower_bound = point_2._1
+  }
+
+  if (point_1._2 < point_2._2) {
+    y_upper_bound = point_2._2
+    y_lower_bound = point_1._2
+  } else {
+    y_upper_bound = point_1._2
+    y_lower_bound = point_2._2
+  }
+  Deduce(|- (x_upper_bound <= canvasWidth & x_lower_bound >= 0))
+  Deduce(|- (y_upper_bound <= canvasHeight & y_lower_bound >= 0))
+
+  while (x <= x_upper_bound && x >= x_lower_bound && y <= y_upper_bound  && y >= y_lower_bound) {
     Invariant(
       Modifies(points, err, x, y),
     )
-    Deduce(|- (ISZ(x, y).size == 2))
+    Deduce(|- (x <= canvasWidth & x >= 0))
+    Deduce(|- (y <= canvasHeight & y >= 0))
+
     points = points :+ ISZ(x, y)
-    Deduce(|- (All(0 until points.size)(i => points(i).size == 2)))
+
+    Deduce(|- ((x >= point_1._1 & x <= point_2._1) | (x <= point_1._1 & x >= point_2._1)))
+    Deduce(|- ((y >= point_1._2 & y <= point_2._2) | (y <= point_1._2 & y >= point_2._2)))
 
     val e2 = 2 * err
 
@@ -90,8 +127,6 @@ import org.sireum._
       y = y + sy
     }
   }
-  Deduce(|- (points.size >= 0))
-  
-  Deduce(|- (! Exists(0 until points.size)(i => points(i)(0) < x1 & points(i)(1) < x2)))
+
   return points
 }
