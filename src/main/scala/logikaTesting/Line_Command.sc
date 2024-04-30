@@ -38,9 +38,13 @@ import org.sireum._
 }
 
 @pure def in_bounds(canvasWidth:Z, canvasHeight:Z, vector: ISZ[ISZ[Z]]):B = {
+  Contract(
+    Requires(vector.size >= 0, All(vector.indices)(i => vector(i).size == 2)),
+  )
   var counter = 0
   while(counter < vector.size){
     Invariant(
+      Modifies(counter),
       counter >= 0,
       counter <= vector.size,
       All(0 until counter)(i => vector(i)(0) <= canvasWidth & vector(i)(1) <= canvasHeight)
