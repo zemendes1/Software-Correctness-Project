@@ -37,34 +37,13 @@ import org.sireum._
   return res
 }
 
-@pure def in_bounds(canvasWidth:Z, canvasHeight:Z, vector: ISZ[ISZ[Z]]):B = {
-  Contract(
-    Requires(vector.size >= 0, All(vector.indices)(i => vector(i).size == 2)),
-  )
-  var counter = 0
-  while(counter < vector.size){
-    Invariant(
-      Modifies(counter),
-      counter >= 0,
-      counter <= vector.size,
-      All(0 until counter)(i => vector(i)(0) <= canvasWidth & vector(i)(1) <= canvasHeight)
-    )
-    if(vector(counter)(0) > canvasWidth || vector(counter)(1) > canvasHeight){
-      return false
-    }
-    counter = counter + 1
-
-  }
-  return true
-}
-
-@pure def draw(x1:Z, y1:Z, x2:Z, y2:Z, canvasWidth:Z, canvasHeight:Z,
-               windowXMax:Z, windowYMax : Z, windowXMin:Z , windowYMin :Z): ISZ[ISZ[Z]] = {
+def draw(x1:Z, y1:Z, x2:Z, y2:Z, canvasWidth:Z, canvasHeight:Z,
+         windowXMax:Z, windowYMax : Z, windowXMin:Z , windowYMin :Z): ISZ[ISZ[Z]] = {
   Contract(
     Requires(windowXMax > windowXMin & windowYMax > windowYMin, canvasWidth > 0, canvasHeight > 0,
       x1 >= windowXMin & x1 <= windowXMax, y1 >= windowYMin & y1 <= windowYMax,
       x2 >= windowXMin & x2 <= windowXMax, y2 >= windowYMin & y2 <= windowYMax),
-    Ensures (in_bounds(canvasWidth, canvasHeight, Res) & Res.size >= 0)
+    Ensures(All(0 until Res.size)(i => Res(i)(0) <= canvasWidth) & All(0 until Res.size)(i => Res(i)(1) <= canvasHeight))
   )
   val point_1 = mapToCanvasSpace(x1, y1, canvasWidth, canvasHeight, windowXMax, windowYMax, windowXMin, windowYMin)
   val point_2 = mapToCanvasSpace(x2, y2, canvasWidth, canvasHeight, windowXMax, windowYMax, windowXMin, windowYMin)
@@ -128,7 +107,11 @@ import org.sireum._
 
   while (x <= x_upper_bound && x >= x_lower_bound && y <= y_upper_bound  && y >= y_lower_bound) {
     Invariant(
-      Modifies(points, err, x, y),
+      Modifies(points, err, x, y, counter, sx, sy),
+      points.size >= 0,
+      All(0 until points.size)(i => points(i).size == 2),
+      All(0 until points.size)(i => points(i)(0) <= canvasWidth),
+      All(0 until points.size)(i => points(i)(1) <= canvasHeight),
     )
     Deduce(|- (x <= canvasWidth & x >= 0))
     Deduce(|- (y <= canvasHeight & y >= 0))
@@ -151,8 +134,6 @@ import org.sireum._
       err = err + dx
       y = y + sy
     }
-
-    Deduce(|-(points(counter)(0) >= 0))
     counter = counter + 1
   }
 
