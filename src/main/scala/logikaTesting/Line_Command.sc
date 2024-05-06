@@ -43,7 +43,8 @@ def draw(x1:Z, y1:Z, x2:Z, y2:Z, canvasWidth:Z, canvasHeight:Z,
     Requires(windowXMax > windowXMin & windowYMax > windowYMin, canvasWidth > 0, canvasHeight > 0,
       x1 >= windowXMin & x1 <= windowXMax, y1 >= windowYMin & y1 <= windowYMax,
       x2 >= windowXMin & x2 <= windowXMax, y2 >= windowYMin & y2 <= windowYMax),
-    Ensures(All(0 until Res.size)(i => Res(i)(0) <= canvasWidth) & All(0 until Res.size)(i => Res(i)(1) <= canvasHeight))
+    Ensures(All(0 until Res.size)(i => Res(i)(0) <= canvasWidth & Res(i)(1) <= canvasHeight & Res(i)(0) >= 0 & Res(i)(1) >= 0),
+      Res.size >= 0)
   )
   val point_1 = mapToCanvasSpace(x1, y1, canvasWidth, canvasHeight, windowXMax, windowYMax, windowXMin, windowYMin)
   val point_2 = mapToCanvasSpace(x2, y2, canvasWidth, canvasHeight, windowXMax, windowYMax, windowXMin, windowYMin)
@@ -110,8 +111,7 @@ def draw(x1:Z, y1:Z, x2:Z, y2:Z, canvasWidth:Z, canvasHeight:Z,
       Modifies(points, err, x, y, counter, sx, sy),
       points.size >= 0,
       All(0 until points.size)(i => points(i).size == 2),
-      All(0 until points.size)(i => points(i)(0) <= canvasWidth),
-      All(0 until points.size)(i => points(i)(1) <= canvasHeight),
+      All(0 until points.size)(i => points(i)(0) <= canvasWidth & points(i)(1) <= canvasHeight & points(i)(0) >= 0 & points(i)(1) >= 0),
     )
     Deduce(|- (x <= canvasWidth & x >= 0))
     Deduce(|- (y <= canvasHeight & y >= 0))
