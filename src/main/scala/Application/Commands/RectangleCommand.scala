@@ -1,6 +1,8 @@
 package Application.Commands
 import Application.Main.coordinate_to_canvas
 
+import scala.collection.mutable.ArrayBuffer
+
 case class RectangleCommand(x1: Int, y1: Int, x2: Int, y2: Int, drawColor: String, fill: Boolean = false) {
   def print(): Unit = println(s"RectangleCommand($x1, $y1, $x2, $y2)")
 
@@ -12,12 +14,12 @@ case class RectangleCommand(x1: Int, y1: Int, x2: Int, y2: Int, drawColor: Strin
     if (fill) {
       val point_1 = coordinate_to_canvas.mapToCanvasSpace(x1, y1)
       val point_2 = coordinate_to_canvas.mapToCanvasSpace(x2, y2)
-      var points: List [(Int, Int)] = List()
+      var points: ArrayBuffer[(Int, Int)] = ArrayBuffer[(Int, Int)]()
       val sx = if (point_1._1 < point_2._1) 1 else -1
       val sy = if (point_1._2 < point_2._2) 1 else -1
       for (x <- point_1._1 to point_2._1 by sx) {
         for (y <- point_1._2 to point_2._2 by sy) {
-          points = points :+ (x, y)
+          points = points ++ Array((x, y))
         }
       }
       points.toArray
