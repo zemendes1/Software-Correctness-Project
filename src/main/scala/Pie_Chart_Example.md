@@ -10,6 +10,6 @@
 
 (DRAW red (TEXT-AT (7 10) C) (TEXT-AT (22 10) Python) (TEXT-AT (14 24) Java) (TEXT-AT (23 18) Scala) (TEXT-AT (4 17) Assembly))
 
-*This will be cut by the algortihm for example:*
+*This will be cut by the algorithm for example:*
 
 (RECTANGLE (20 20) (35 28))

@@ -7,5 +7,3 @@
 (FILL green (RECTANGLE (2 15) (18 16))))
 (FILL red (RECTANGLE (2 11) (7 12)))
 (FILL blue (RECTANGLE (2 13) (11 14)))
-
-
