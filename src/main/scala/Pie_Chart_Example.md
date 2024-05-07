@@ -1,4 +1,4 @@
-(BOUNDING-BOX (0 0) (29 29))
+(BOUNDING-BOX (0 0) (31 31))
 
 (FILL yellow (CIRCLE (15 15) 8))
 
@@ -10,3 +10,6 @@
 
 (DRAW red (TEXT-AT (7 10) C) (TEXT-AT (22 10) Python) (TEXT-AT (14 24) Java) (TEXT-AT (23 18) Scala) (TEXT-AT (4 17) Assembly))
 
+*This will be cut by the algortihm for example:*
+
+(RECTANGLE (20 20) (35 28))
