@@ -109,7 +109,6 @@ object Main extends JFXApp3 {
       else{
         commandValidityTextProperty.value = "The first command must be a BoundingBoxCommand"
         commandValidityColorProperty.value = Color.Red
-        println("The first command must be a BoundingBoxCommand")
       }
     }
     else{
@@ -122,7 +121,6 @@ object Main extends JFXApp3 {
       else {
       commandValidityTextProperty.value = "Invalid command"
       commandValidityColorProperty.value = Color.Red
-      println("Invalid command")
       }
     }
     draw_pixels_on_canvas(parsedCommands)
